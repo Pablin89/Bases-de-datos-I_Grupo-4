@@ -1,8 +1,9 @@
-Use base_consorcio;
 --Insertar un registro en Administrador, luego otro registro en consorcio 
 --y por último 3 registros en gasto, correspondiente a ese nuevo consorcio.
 
--------TRANSACCIONES-------
+Use base_consorcio;
+
+----------------------------TRANSACCIONES----------------------------------
 
 ---Con error en la transacción---
 SET LANGUAGE Spanish;
@@ -34,7 +35,12 @@ BEGIN CATCH
 	SELECT ERROR_MESSAGE() As Error-- Se captura el error y lo muestra.
 	ROLLBACK TRAN
 END CATCH
-
+ 
+ ---Controlar la realizacion de las inserciones------------------------------------------------------------------
+select * from administrador where apeynom = 'Juan Pablo Duete'
+select * from consorcio where idprovincia = 7 --No existen en principio consorcios en la provincia de Corrientes
+select * from gasto where idprovincia = 7
+------------------------------------------------------------------------------------------------------------------
 
 ---Sin error en la transacción---
 SET LANGUAGE Spanish;
@@ -67,13 +73,21 @@ BEGIN CATCH
 	ROLLBACK TRAN
 END CATCH
 
+ ---Controlar la realizacion de las inserciones------------------------------------------------------------------
+select * from administrador where apeynom = 'Juan Pablo Duete'
+select * from consorcio where idprovincia = 7 --No existen en principio consorcios en la provincia de Corrientes
+select * from gasto where idprovincia = 7
+------------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 -------TRANSACCIONES ANIDADAS-------
 
 ---Con error en la transacción---
 SET LANGUAGE Spanish; 
-select * from administrador where apeynom = 'Juan José Paso'
+
 BEGIN TRY
 	BEGIN TRAN TS_Anidadas
 	SELECT CONCAT('El nivel de anidamiento es ', @@TRANCOUNT) As 'Numero de anidamientos' --Esta sentencia cuenta el número de transacciones anidadas
@@ -93,13 +107,13 @@ BEGIN TRY
 				SELECT CONCAT('El nivel de anidamiento es ', @@TRANCOUNT) As 'Numero de anidamientos'
 				--Inserción 3 registros de gastos
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (30, 7, 1,1,'20231005',2,5000.00)
+				VALUES (7, 7, 2,1,'20231005',2,5000.00)
 
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (7, 7, 1,1,'20231015',2,20000.00)
+				VALUES (7, 7, 2,1,'20231015',2,20000.00)
 
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (7, 7, 1,1,'20231028',2,10000.00)
+				VALUES (7, 7, 10,1,'20231028',2,10000.00)
 			COMMIT TRAN TS_InsertarGastos
 		COMMIT TRAN TS_InsertarConsorcio
 
@@ -112,6 +126,12 @@ BEGIN CATCH
 	ROLLBACK TRAN TS_Anidadas
 END CATCH
 
+
+ ---Controlar la realizacion de las inserciones----------------------------------------------------------------------------------
+select * from administrador where apeynom = 'Juan José Paso'
+select * from consorcio where idprovincia = 7  and idconsorcio = 10 --No existe el consorcio n° 10 en la provincia de Corrientes
+select * from gasto where idprovincia = 7 and idconsorcio = 10
+---------------------------------------------------------------------------------------------------------------------------------
 
 ---Sin error en la transacción---
 SET LANGUAGE Spanish; 
@@ -135,13 +155,13 @@ BEGIN TRY
 				SELECT CONCAT('El nivel de anidamiento es ', @@TRANCOUNT) As 'Numero de anidamientos'
 				--Inserción 3 registros de gastos
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (7, 7, 1,1,'20231005',2,5000.00)
+				VALUES (7, 7, 2,1,'20231005',2,5000.00)
 
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (7, 7, 1,1,'20231015',2,20000.00)
+				VALUES (7, 7, 2,1,'20231015',2,20000.00)
 
 				INSERT INTO gasto (idprovincia,idlocalidad,idconsorcio,periodo,fechapago,idtipogasto,importe) 
-				VALUES (7, 7, 1,1,'20231028',2,10000.00)
+				VALUES (7, 7, 2,1,'20231028',2,10000.00)
 			COMMIT TRAN TS_InsertarGastos
 		COMMIT TRAN TS_InsertarConsorcio
 
@@ -153,3 +173,10 @@ BEGIN CATCH
 	SELECT ERROR_MESSAGE() As Error -- Se captura el error y lo muestra.
 	ROLLBACK TRAN TS_Anidadas
 END CATCH
+
+
+ ---Controlar la realizacion de las inserciones------------------------------------------------------------------------------------------------
+select * from administrador where apeynom = 'Juan José Paso'
+select * from consorcio where idprovincia = 7  and idconsorcio = 2 --No existe el consorcio n° 2 hasta el momento en la provincia de Corrientes
+select * from gasto where idprovincia = 7 and idconsorcio = 2
+----------------------------------------------------
